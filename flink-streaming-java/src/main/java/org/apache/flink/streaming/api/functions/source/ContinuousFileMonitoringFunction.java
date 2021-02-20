@@ -33,7 +33,6 @@ import org.apache.flink.runtime.state.FunctionInitializationContext;
 import org.apache.flink.runtime.state.FunctionSnapshotContext;
 import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction;
 import org.apache.flink.util.Preconditions;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +61,22 @@ import java.util.TreeMap;
  *
  * <p><b>IMPORTANT NOTE: </b> Splits are forwarded downstream for reading in ascending modification time order,
  * based on the modification time of the files they belong to.
+ *
+ * 在具体实现上，Flink 把文件读取过程分为两个子任务，即目录监控和数据读取。
+ * 每个子任务都由单独的实体实现。目录监控由单个非并行（并行度为1）的任务执行，
+ * 而数据读取由并行运行的多个任务执行。后者的并行性等于作业的并行性。
+ * 单个目录监控任务的作用是扫描目录（根据 watchType 定期扫描或仅扫描一次），
+ * 查找要处理的文件并把文件分割成切分片（splits），然后将这些切分片分配给下游
+ * reader。reader 负责读取数据。每个切分片只能由一个 reader 读取，
+ * 但一个 reader 可以逐个读取多个切分片。
+ * 重要注意：
+ * 如果 watchType 设置为 FileProcessingMode.PROCESS_CONTINUOUSLY，
+ * 则当文件被修改时，其内容将被重新处理。这会打破“exactly-once”语义，
+ * 因为在文件末尾附加数据将导致其所有内容被重新处理。
+ * 如果 watchType 设置为 FileProcessingMode.PROCESS_ONCE，
+ * 则 source 仅扫描路径一次然后退出，而不等待 reader 完成文件内容的读取。
+ * 当然 reader 会继续阅读，直到读取所有的文件内容。关闭 source 后就不会再有检查点。
+ * 这可能导致节点故障后的恢复速度较慢，因为该作业将从最后一个检查点恢复读取。
  */
 @Internal
 public class ContinuousFileMonitoringFunction<OUT>
