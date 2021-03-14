@@ -24,7 +24,8 @@ public class MyDataSource extends RichParallelSourceFunction<DataEntity> {
                             "tiezhu",
                             birth,
                             new Time(birth.getTime()),
-                            new Date(System.currentTimeMillis())));
+                            new Date(System.currentTimeMillis()),
+                            id % 2 == 0));
             Thread.sleep(1000);
         }
     }

@@ -22,12 +22,18 @@ public class DataEntity {
 
     private Boolean sex;
 
-    public DataEntity(Integer id, String name, Timestamp birth, Time todayTime, Date todayDate) {
+    public DataEntity(Integer id,
+                      String name,
+                      Timestamp birth,
+                      Time todayTime,
+                      Date todayDate,
+                      Boolean sex) {
         this.id = id;
         this.name = name;
         this.birth = birth;
         this.todayTime = todayTime;
         this.todayDate = todayDate;
+        this.sex = sex;
     }
 
     public DataEntity(
