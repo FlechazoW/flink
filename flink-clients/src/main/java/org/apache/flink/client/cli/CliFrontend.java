@@ -169,6 +169,7 @@ public class CliFrontend {
     protected void runApplication(String[] args) throws Exception {
         LOG.info("Running 'run-application' command.");
 
+        // 获取 run 动作默认的配置项
         final Options commandOptions = CliFrontendParser.getRunCommandOptions();
         final CommandLine commandLine = getCommandLine(commandOptions, args, true);
 
@@ -1145,6 +1146,7 @@ public class CliFrontend {
     // --------------------------------------------------------------------------------------------
 
     public static String getConfigurationDirectoryFromEnv() {
+        // 从环境变量（config.sh）里获取参数路径
         String location = System.getenv(ConfigConstants.ENV_FLINK_CONF_DIR);
 
         if (location != null) {

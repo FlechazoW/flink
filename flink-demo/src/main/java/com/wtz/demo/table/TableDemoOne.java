@@ -1,10 +1,11 @@
 package com.wtz.demo.table;
 
-import com.wtz.demo.KafkaCore;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+
+import com.wtz.demo.KafkaCore;
 
 public class TableDemoOne {
     public static void main(String[] args) throws Exception {
@@ -16,9 +17,7 @@ public class TableDemoOne {
 
         DataStream<String> source =
                 KafkaCore.addKafkaSource(
-                        env,
-                        KafkaCore.buildKafkaConsumerProperties("kudu1:9092"),
-                        "tiezhu_in_one");
+                        env, KafkaCore.buildKafkaConsumerProperties("kudu1:9092"), "tiezhu_in_one");
 
         tableEnvironment.executeSql(
                 "CREATE TABLE printTable ("
